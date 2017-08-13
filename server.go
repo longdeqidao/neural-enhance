@@ -29,7 +29,7 @@ func inFilename() string {
 }
 
 func outFilename(in string) string {
-	return filepath.Join(TMP_DIR, fmt.Sprintf("%s_ne%dx.png", in, ZOOM_SIZE))
+	return fmt.Sprintf("%s_ne%dx.png", in, ZOOM_SIZE)
 }
 
 func sendError(w http.ResponseWriter, code int, msg string) {
@@ -46,7 +46,7 @@ func execEnhance(data []byte) ([]byte, error) {
 	}
 
 	done := make(chan error)
-	cmd := exec.Command("python3", "./enhance.py", "--type=photo", "--model=repair",
+	cmd := exec.Command("/opt/conda/bin/python3", "./enhance.py", "--type=photo", "--model=repair",
 		fmt.Sprintf("--zoom=%d", ZOOM_SIZE), in)
 	// TODO: read out of stderr
 	// cmd.Stdin, cmd.Stdout, cmd.Stderr = nil, nil, nil
