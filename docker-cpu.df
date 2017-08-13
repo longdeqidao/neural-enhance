@@ -11,6 +11,12 @@ RUN apt-get -qq update           &&  \
         "pkg-config"              && \
     rm -rf /var/lib/apt/lists/*
 
+# Install Golang.
+RUN wget --quiet https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz
+RUN tar -xzf go1.8.3.linux-amd64.tar.gz
+ENV GOROOT /go
+ENV PATH $PATH:$GOROOT/bin
+
 # Miniconda.
 RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
@@ -22,6 +28,11 @@ COPY requirements.txt .
 RUN /opt/conda/bin/conda install -q -y conda numpy scipy pip pillow
 RUN /opt/conda/bin/python3.5 -m pip install -q -r "requirements.txt"
 
+COPY server.go .
+EXPOSE 5000
+RUN go build -o server server.go
+
+
 # Copy only required project files
 COPY enhance.py .
 
@@ -30,5 +41,6 @@ RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne1
 RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne1x-photo-repair-0.3.pkl.bz2"
 RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne2x-photo-default-0.3.pkl.bz2"
 RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne4x-photo-default-0.3.pkl.bz2"
-# Set an entrypoint to the main enhance.py script
-ENTRYPOINT ["/opt/conda/bin/python3.5", "enhance.py", "--device=cpu"]
+
+# Run main server.
+ENTRYPOINT ["./server"]
