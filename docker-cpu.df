@@ -26,12 +26,10 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86
 WORKDIR /ne
 COPY requirements.txt .
 RUN /opt/conda/bin/conda install -q -y conda numpy scipy pip pillow
-RUN /opt/conda/bin/python3.5 -m pip install -q -r "requirements.txt"
+RUN /opt/conda/bin/python3 -m pip install -q -r "requirements.txt"
 
 COPY server.go .
-EXPOSE 5000
 RUN go build -o server server.go
-
 
 # Copy only required project files
 COPY enhance.py .
@@ -42,5 +40,5 @@ RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne1
 RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne2x-photo-default-0.3.pkl.bz2"
 RUN wget -q "https://github.com/alexjc/neural-enhance/releases/download/v0.3/ne4x-photo-default-0.3.pkl.bz2"
 
-# Run main server.
-ENTRYPOINT ["./server"]
+# docker build -t ne_server:1.0 -f docker-cpu.df .
+# docker run -d --net host ne_server ./server
